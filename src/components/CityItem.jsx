@@ -12,7 +12,6 @@ const formatDate = (date) =>
 
 function CityItem({ city }) {
   const { currentCity } = useCities();
-  console.log("CITY: ", city, "CURR: ", currentCity);
 
   return (
     <li>
