@@ -8,13 +8,20 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import styles from "./Map.module.css";
+import Button from "./Button";
 import { useEffect, useState } from "react";
 import { useCities } from "../contexts/CitiesContext";
+import { useGeolocation } from "../hooks/useGeolocation";
 
 function Map() {
   const { cities } = useCities();
   const [mapPosition, setMapPosition] = useState([40, 0]);
   const [searchParams] = useSearchParams();
+  const {
+    isLoading: isLoadingPosition,
+    position: geolocationPosition,
+    getPosition,
+  } = useGeolocation();
 
   const mapLat = searchParams.get("lat");
   const mapLng = searchParams.get("lng");
@@ -23,8 +30,18 @@ function Map() {
     if (mapLat && mapLng) setMapPosition([mapLat, mapLng]);
   }, [mapLat, mapLng]);
 
+  useEffect(() => {
+    if (geolocationPosition) {
+      const { lat, long } = geolocationPosition;
+      setMapPosition([lat, long]);
+    }
+  }, [geolocationPosition]);
+
   return (
     <div className={styles.mapContainer}>
+      <Button type="position" onClick={getPosition}>
+        {isLoadingPosition ? "Loading..." : "Use your position."}
+      </Button>
       <MapContainer
         center={mapPosition}
         zoom={6}
@@ -72,20 +89,3 @@ function DetectClick() {
 }
 
 export default Map;
-
-/*
-Lisbon: "position": {
-         "lat": 38.727881642324164,
-         "lng": -9.140900099907554
-       },
-
-Madrid: "position": {
-          "lat": 40.46635901755316,
-          "lng": -3.7133789062500004
-         },
-
-Berlin: "position": {
-         "lat": 52.53586782505711,
-         "lng": 13.376933665713324
-       },
-*/
